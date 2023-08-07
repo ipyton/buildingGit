@@ -1,2 +1,2 @@
 # buildingGit
-This is a version control system which is implemnetted by rust
+This is a version control system which is implemnetted by golang
