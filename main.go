@@ -35,7 +35,13 @@ func commandDispatcher(command string) {
 		fmt.Println(objectsPath)
 		workspace := Workspace{path: path,
 		ignore: []string{".", "..", ".git"}}
-		workspace.listFiles()
+		files := workspace.listFiles()
+		database := newDatabase(objectsPath)
+		for _, filePath := range files {
+			data := readFile(filePath)
+			blob := newBlob(data)
+			database.processWrite(blob)
+		}
 	}
 
 
@@ -43,7 +49,8 @@ func commandDispatcher(command string) {
 
 }
 func main(){
-	commandDispatcher("commit")
+	//commandDispatcher("commit")
+	//writeObject()
 
 
 }
