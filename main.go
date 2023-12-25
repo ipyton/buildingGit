@@ -66,12 +66,16 @@ func handleCommit(path string){
 	var message string
 	fmt.Scanln(&message)
 
-	commit := newCommit(object.id,author, message,time.Now())
+	ref := newRef(gitPath)
+	parent := ref.readHead()
+
+	commit := newCommit(object.id,author, message,time.Now(), parent)
 	commitObject := Object{kind: "commit", content: []byte(commit.toString())}
 	database.write(commitObject)
 	headPath := path2.Join(gitPath, "HEAD")
 	file, _ := os.OpenFile(headPath, os.O_CREATE|os.O_WRONLY, 0777)
 	file.Write([]byte("(root-commit) " + commitObject.id + commit.treeId))
+
 
 }
 

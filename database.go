@@ -5,6 +5,7 @@ import (
 	"compress/zlib"
 	"crypto/sha1"
 	"encoding/base64"
+	"errors"
 	"io"
 	"os"
 	"path"
@@ -31,7 +32,7 @@ func (d Database)processWrite(tree Tree)  {
 }
 
 
-func (d Database) writeToDisk(id [20]byte, content []byte){
+func (d Database) writeToDisk(id [20]byte, content []byte) (error){
 	//var in bytes.Buffer
 	//writer := zlib.NewWriter(&in)
 	//writer.Write([]byte())
@@ -42,17 +43,22 @@ func (d Database) writeToDisk(id [20]byte, content []byte){
 	for b :=range fileNameByte {
 		fileName += string(b)
 	}
+	_, err2 := os.Stat(fileName)
+	if err2 != nil {
+		return errors.New("File already exist ")
+	}
 	err := os.Mkdir(path.Join(d.path, s), 777)
 
 	open, err := os.Open(path.Join(d.path, s, fileName))
 	if err != nil {
-		return
+		return errors.New("File ca not be opened ")
 	}
 	_, err = open.Write(content)
 	if err != nil {
-		return
+		return errors.New("File can not be write ")
 	}
 	open.Close()
+	return nil
 }
 
 func readRawToBlob(path string){

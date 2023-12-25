@@ -17,7 +17,7 @@ func (tree Tree) toString() string {
 	tree.sortByName()
 	result := ""
 	for _, item := range tree.objects {
-		result += item.name + item.objectId
+		result += item.mode() + item.name + item.objectId
 	}
 	return result
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"path"
 )
 
 type Workspace struct {
@@ -9,27 +10,34 @@ type Workspace struct {
 	ignore []string
 }
 
-func (receiver Workspace) init(path string, ignore []string)  {
-	receiver.ignore = ignore
-	receiver.path = path
+func (workspace Workspace) init(path string, ignore []string)  {
+	workspace.ignore = ignore
+	workspace.path = path
 }
 
-func (receiver Workspace) listFiles() []string  {
-	dirs, _ := os.ReadDir(receiver.path)
-	var ignored map[string]string
-	for _, value := range receiver.ignore {
-		ignored[value] = ""
+
+func (workspace Workspace) listFiles(basePath string) []string  {
+	var result []string
+	queue := make([]string, 0)
+	queue = append(queue, workspace.path)
+	for {
+		if 0 == len(queue){
+			break
+		}
+		basePath := queue[0]
+		stat, _ := os.Stat(basePath)
+		if stat.IsDir() {
+			dirs, _ := os.ReadDir(basePath)
+			for _,dir := range dirs {
+				queue = append(queue, path.Join(basePath, dir.Name()))
+			}
+		} else {
+			result = append(result, stat.Name())
+		}
+		queue = queue[1:]
 	}
 
-	var result []string
-	for _, dir :=range dirs{
-		if !dir.IsDir(){
-			path:=dir.Name()
-			if ignored[path] != ""{
-				result = append(result, path)
-			}
-		}
-	}
+
 	return result
 }
 
@@ -37,4 +45,9 @@ func readFile(path string) []byte{
 	file, _ := os.ReadFile(path)
 	return file
 
+}
+
+func statFile(path string) os.FileInfo{
+	stat, _ := os.Stat(path)
+	return stat
 }
