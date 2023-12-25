@@ -1,15 +1,16 @@
 package main
 
 
-type Blob struct {
+type Object struct {
 	size int
 	content []byte
-	t string
+	kind string
 	id string
 }
 
-func (Blob) newBlob(content []byte) Blob {
-	return Blob{size:len(content),
+func newObject(content []byte, kind string) Object {
+	return Object{size:len(content),
 	content: content,
-	t:"object",id:""}
+	kind: kind,
+	id:""}
 }

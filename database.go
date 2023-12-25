@@ -17,17 +17,21 @@ func newDatabase(path string) Database {
 	return Database{path: path}
 }
 
-func (d Database) processWrite(object Blob) {
-
+func (d Database) write(object Object) {
 	contentBytes := []byte(object.content)
-	content := object.t + " " +
+	content := object.kind + " " +
 		string(rune(object.size)) + " " +
 		base64.StdEncoding.EncodeToString(contentBytes)
 	sum := sha1.Sum([]byte(content))
-	d.writeObject(sum, object.content)
+	d.writeToDisk(sum, object.content)
 }
 
-func (d Database) writeObject(id [20]byte, content []byte){
+func (d Database)processWrite(tree Tree)  {
+
+}
+
+
+func (d Database) writeToDisk(id [20]byte, content []byte){
 	//var in bytes.Buffer
 	//writer := zlib.NewWriter(&in)
 	//writer.Write([]byte())
