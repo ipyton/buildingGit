@@ -12,7 +12,7 @@ func init(){
 
 }
 
-func commandDispatcher(command string) {
+func commandDispatcher(command string, args []string) {
 	path, _ := os.Getwd()
 	if command == "init" {
 		handleInit(path)
@@ -20,6 +20,24 @@ func commandDispatcher(command string) {
 	if command == "commit" {
 		handleCommit(path)
 	}
+	if command == "add" {
+		handleAdd(path, args)
+	}
+}
+
+func handleAdd(path string, args []string) {
+	gitPath := path2.Join(path,".git")
+	// objectsPath := path2.Join(gitPath, "objects")
+	workspace := Workspace{path: path,
+		ignore: []string{".", "..", ".git"}}
+	database := newDatabase(path2.Join("objects"))
+	index := newIndex(path2.Join("index"))
+	workspace.listFiles()
+	workspace.
+	if len(args) != 1 {
+		fmt.Println("needs an argument!")
+	}
+	path = args[0]
 }
 
 func handleInit(path string) {
@@ -75,8 +93,6 @@ func handleCommit(path string){
 	headPath := path2.Join(gitPath, "HEAD")
 	file, _ := os.OpenFile(headPath, os.O_CREATE|os.O_WRONLY, 0777)
 	file.Write([]byte("(root-commit) " + commitObject.id + commit.treeId))
-
-
 }
 
 

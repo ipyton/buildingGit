@@ -16,7 +16,7 @@ func (workspace Workspace) init(path string, ignore []string)  {
 }
 
 
-func (workspace Workspace) listFiles(basePath string) []string  {
+func (workspace Workspace) listFiles() []string  {
 	var result []string
 	queue := make([]string, 0)
 	queue = append(queue, workspace.path)
