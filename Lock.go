@@ -10,6 +10,7 @@ type Lock struct {
 	lockPath string
 	status bool
 	file *os.File
+
 }
 
 func newLock(path string) Lock {

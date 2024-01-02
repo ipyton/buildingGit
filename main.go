@@ -26,18 +26,28 @@ func commandDispatcher(command string, args []string) {
 }
 
 func handleAdd(path string, args []string) {
-	gitPath := path2.Join(path,".git")
-	// objectsPath := path2.Join(gitPath, "objects")
-	workspace := Workspace{path: path,
-		ignore: []string{".", "..", ".git"}}
-	database := newDatabase(path2.Join("objects"))
-	index := newIndex(path2.Join("index"))
-	workspace.listFiles()
-	workspace.
 	if len(args) != 1 {
 		fmt.Println("needs an argument!")
 	}
-	path = args[0]
+	gitPath := path2.Join(path,".git")
+	// objectsPath := path2.Join(gitPath, "objects")
+	//workspace := Workspace{path: path,
+	//	ignore: []string{".", "..", ".git"}}
+	database := newDatabase(path2.Join(gitPath, "objects"))
+	index := newIndex(path2.Join(gitPath, "index"))
+	for _, argPath := range args {
+		pathInDirectory := path2.Join(path, argPath)
+		byPath := listFilesByPath(pathInDirectory)
+		for _, file := range byPath {
+			data := readFile(file)
+			stat := statFile(file)
+			blob := newObject(data, "blob")
+			database.write(blob)
+			index.add(path, blob.id, stat)
+		}
+	}
+	index.writeUpdates()
+
 }
 
 func handleInit(path string) {

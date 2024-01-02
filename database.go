@@ -51,7 +51,7 @@ func (d Database) writeToDisk(id [20]byte, content []byte) (error){
 
 	open, err := os.Open(path.Join(d.path, s, fileName))
 	if err != nil {
-		return errors.New("File ca not be opened ")
+		return errors.New("File can not be opened ")
 	}
 	_, err = open.Write(content)
 	if err != nil {

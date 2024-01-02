@@ -15,11 +15,15 @@ func newEntry(name string, objectId string, stat os.FileInfo) Entry {
 	return Entry{name: name,objectId: objectId, stat: stat}
 }
 
-func (entry Entry) mode() string{
+func (entry Entry) mode() string {
 	if entry.stat.Mode() > 111 {
 		return EXECUTABLE_MODE
 	}
 	return REGULAR_MODE
 
+}
+
+func (entry Entry) toString() string {
+	return entry.name + " __ " + entry.objectId + entry.stat.Name()
 }
 

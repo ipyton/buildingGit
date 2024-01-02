@@ -16,10 +16,11 @@ func (workspace Workspace) init(path string, ignore []string)  {
 }
 
 
-func (workspace Workspace) listFiles() []string  {
+
+func listFilesByPath(targetPath string) []string{
 	var result []string
 	queue := make([]string, 0)
-	queue = append(queue, workspace.path)
+	queue = append(queue, targetPath)
 	for {
 		if 0 == len(queue){
 			break
@@ -36,9 +37,12 @@ func (workspace Workspace) listFiles() []string  {
 		}
 		queue = queue[1:]
 	}
-
-
 	return result
+}
+
+
+func (workspace Workspace) listFiles() []string  {
+	return listFilesByPath(workspace.path)
 }
 
 func readFile(path string) []byte{
