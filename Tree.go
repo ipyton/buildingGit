@@ -33,3 +33,4 @@ func newTree(entries []Entry) Tree{
 	return Tree{objectType:"tree", mode: "100644", objects: entries}
 }
 
+

@@ -4,6 +4,9 @@ import (
 	"crypto/sha1"
 	"hash"
 	"os"
+	"slices"
+	"strconv"
+	"strings"
 )
 
 type StringHeap []string
@@ -16,7 +19,14 @@ type Index struct {
 	lock Lock
 	entries map[string] Entry
 	keys StringHeap
-	sha1Digest hash.Hash
+	sha1Digest    hash.Hash
+	HeaderSize   int
+	HeaderFormat string
+	Signature    string
+	Version int
+	changed bool
+	EntryMinSize int
+	EntryBlock int
 }
 
 
@@ -27,16 +37,17 @@ func newIndex(path string) Index {
 
 	//heap.Init(keys)
 
-	return Index{file: open, lock: newLock(path), path: path, sha1Digest: sha1.New()}
+	return Index{file: open, lock: newLock(path), path: path, sha1Digest: sha1.New(), HeaderSize: 12,
+		HeaderFormat: "a4N2", Signature: "DIRC", Version: 2}
 }
 
 func (this Index) clear() bool {
 	for key, _ := range this.entries {
 		delete(this.entries, key)
 	}
-
-	for
-
+	this.keys = this.keys[:0]
+	this.sha1Digest.Reset()
+	return true
 
 }
 
@@ -44,6 +55,8 @@ func (this Index) clear() bool {
 func (this Index) add(pathName string, oid string, state os.FileInfo) {
 	entry := newEntry(pathName, oid, state)
 	this.entries[pathName] = entry
+	this.changed = true
+
 }
 
 
@@ -107,6 +120,10 @@ func (this Index) read(size int) []byte{
 
 
 func (this Index) writeUpdates() bool {
+	if this.changed {
+		return this.lock.rollback()
+	}
+
 	if !this.lock.lock() {
 		return false
 	}
@@ -115,33 +132,78 @@ func (this Index) writeUpdates() bool {
 	for _, entry := range this.entries {
 		this.write(entry.toString())
 	}
+
 	this.finishWrite()
 	return true
 }
 
 
-func index() {
+
+func (this Index) readHeader(file os.File) int {
+	buffer := make([]byte, this.HeaderSize)
+	read, err := file.Read(buffer)
+	if err != nil || read != this.HeaderSize {
+		return -1
+	}
+	split := strings.Split(string(buffer), "@")
+	signature, versionString, countString := split[0],split[1], split[2]
+	version, err := strconv.Atoi(versionString)
+	if signature != this.Signature || version != this.Version {
+		return -1
+	}
+	count, err := strconv.Atoi(countString)
+	if err != nil {
+		return -1
+	}
+	return count
+}
+
+//this one should be changed
+func (this Index) readEntries(file os.File, count int) bool {
+	for i := 0; i < count; i ++ {
+		buffer := make([]byte, this.EntryMinSize, this.EntryMinSize)
+		size, err := file.Read(buffer)
+		for {
+			if buffer[size - 1] != '\n' {
+				appendBuffer := make([]byte, 8, 8)
+				size, err := file.Read(appendBuffer)
+				if size != 0 || err != nil {
+					return false
+				}
+				buffer = append(buffer,appendBuffer...)
+			} else {
+				break
+			}
+		}
+		if  err != nil {
+			return false
+		}
+		entry := parseEntryFromBytes(buffer)
+		this.storeEntry(entry)
+	}
+	return true
 
 }
 
-func readHeader() {
+func (this Index) storeEntry(entry Entry) {
+	this.keys = append(this.keys, entry.key)
+	this.entries[entry.key] = entry
 
 }
 
-func readEntries() {
+func (this Index) eachEntry()  {
 
 }
 
-func storeEntry() {
+func (this Index) discardConflicts(entry Entry){
+	for _, directory := range entry.parentDirectories() {
+		delete(this.keys, directory)
 
+		delete(this.entries, directory)
+	}
 }
 
-func add(path string, objectId string, status string){
-
-
-}
-
-func writeUpdates() {
+func basename() {
 
 }
 

@@ -46,6 +46,11 @@ func (lock Lock) commit() {
 	lock.file = nil
 }
 
+func (lock Lock) rollback() {
+	lock.raiseOnStaleLock()
+
+}
+
 func (lock Lock) raiseOnStaleLock() bool {
 	if !lock.status {
 		return false
