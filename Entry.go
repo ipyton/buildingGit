@@ -14,6 +14,7 @@ type Entry struct {
 	name string
 	objectId string
 	stat os.FileInfo
+	path string
 }
 
 

@@ -23,6 +23,10 @@ func commandDispatcher(command string, args []string) {
 	if command == "add" {
 		handleAdd(path, args)
 	}
+	if (command == "handle") {
+		handleStatus()
+
+	}
 }
 
 func handleAdd(path string, args []string) {
@@ -35,6 +39,7 @@ func handleAdd(path string, args []string) {
 	//	ignore: []string{".", "..", ".git"}}
 	database := newDatabase(path2.Join(gitPath, "objects"))
 	index := newIndex(path2.Join(gitPath, "index"))
+	index.loadForUpdate()
 	for _, argPath := range args {
 		pathInDirectory := path2.Join(path, argPath)
 		byPath := listFilesByPath(pathInDirectory)
@@ -106,6 +111,9 @@ func handleCommit(path string){
 }
 
 
+func handleStatus() {
+
+}
 
 
 func main(){

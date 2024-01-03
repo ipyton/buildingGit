@@ -4,6 +4,7 @@ import (
 	"crypto/sha1"
 	"github.com/wangjia184/sortedset"
 	"hash"
+	"main/utils"
 	"os"
 	"strconv"
 	"strings"
@@ -14,7 +15,7 @@ type Index struct {
 	file * os.File
 	path string
 	lock Lock
-	entries map[string] Entry
+	entries map[string] *Entry
 	keys * sortedset.SortedSet
 	sha1Digest    hash.Hash
 	HeaderSize   int
@@ -24,6 +25,7 @@ type Index struct {
 	changed bool
 	EntryMinSize int
 	EntryBlock int
+	parentDirectory map[string] []string
 }
 
 
@@ -50,7 +52,7 @@ func (this Index) clear() bool {
 
 func (this Index) add(pathName string, oid string, state os.FileInfo) {
 	entry := newEntry(pathName, oid, state)
-	this.entries[pathName] = entry
+	this.entries[pathName] = &entry
 	this.changed = true
 
 }
@@ -188,11 +190,14 @@ func (this Index) readEntries(file os.File, count int) bool {
 func (this Index) storeEntry(entry Entry) {
 	this.keys.AddOrUpdate(entry.key(),20 ,nil)
 	// this.keys = append(this.keys, entry.key)
-	this.entries[entry.key()] = entry
-
+	this.entries[entry.key()] = &entry
+	parents := utils.GetAncestors(entry.path)
+	for _, path := range parents {
+		this.parentDirectory[path] = append(this.parentDirectory[path], entry.path)
+	}
 }
 
-func (this Index) opEachEntry(op func(entry Entry)) {
+func (this Index) opEachEntry(op func(entry *Entry)) {
 	for _,v := range this.entries {
 		op(v)
 	}
@@ -204,6 +209,36 @@ func (this Index) discardConflicts(entry Entry){
 		delete(this.entries, directory)
 	}
 }
+
+func (this Index) removeChildren(path string) {
+	if this.parentDirectory[path] == nil {
+		return
+	}
+	var names []string
+	copy(this.parentDirectory[path], names)
+	for _, value := range names {
+		this.removeEntry(value)
+	}
+}
+
+func (this Index) removeEntry(name string){
+	if this.entries[name] == nil {
+		return
+	}
+	entry := this.entries[name]
+	this.keys.Remove(name)
+	delete(this.entries, name)
+	directories := entry.parentDirectories()
+	for _, directory := range directories {
+		this.parentDirectory[directory].remove(entry.path)
+		//delete the struct in the parent directory.
+	}
+}
+
+func (this Index) isTracked(key string) bool {
+	return this.entries[key] != nil
+}
+
 
 func basename() {
 
