@@ -2,15 +2,12 @@ package main
 
 import (
 	"crypto/sha1"
+	"github.com/wangjia184/sortedset"
 	"hash"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 )
-
-type StringHeap []string
-
 
 
 type Index struct {
@@ -18,7 +15,7 @@ type Index struct {
 	path string
 	lock Lock
 	entries map[string] Entry
-	keys StringHeap
+	keys * sortedset.SortedSet
 	sha1Digest    hash.Hash
 	HeaderSize   int
 	HeaderFormat string
@@ -34,21 +31,20 @@ func newIndex(path string) Index {
 	open, _ := os.Open(path)
 	//stringList := []int{1,}
 	//keys := [..]StringHeap{"1"}
-
+	set := sortedset.New()
 	//heap.Init(keys)
 
 	return Index{file: open, lock: newLock(path), path: path, sha1Digest: sha1.New(), HeaderSize: 12,
-		HeaderFormat: "a4N2", Signature: "DIRC", Version: 2}
+		HeaderFormat: "a4N2", Signature: "DIRC", Version: 2, keys: set}
 }
 
 func (this Index) clear() bool {
 	for key, _ := range this.entries {
 		delete(this.entries, key)
 	}
-	this.keys = this.keys[:0]
+	this.keys = sortedset.New()
 	this.sha1Digest.Reset()
 	return true
-
 }
 
 
@@ -82,6 +78,10 @@ func (this Index) openIndexFile(path string) bool {
 func (this Index) load(path string) {
 	this.openIndexFile(path)
 	if this.file != nil {
+		headerSize := this.readHeader(*this.file)
+		this.readEntries(*this.file, headerSize)
+		checker := newSumChecker(this.path)
+		checker.verify()
 
 	}
 
@@ -186,19 +186,21 @@ func (this Index) readEntries(file os.File, count int) bool {
 }
 
 func (this Index) storeEntry(entry Entry) {
-	this.keys = append(this.keys, entry.key)
-	this.entries[entry.key] = entry
+	this.keys.AddOrUpdate(entry.key(),20 ,nil)
+	// this.keys = append(this.keys, entry.key)
+	this.entries[entry.key()] = entry
 
 }
 
-func (this Index) eachEntry()  {
-
+func (this Index) opEachEntry(op func(entry Entry)) {
+	for _,v := range this.entries {
+		op(v)
+	}
 }
 
 func (this Index) discardConflicts(entry Entry){
 	for _, directory := range entry.parentDirectories() {
-		delete(this.keys, directory)
-
+		this.keys.Remove(entry.key())
 		delete(this.entries, directory)
 	}
 }

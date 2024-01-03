@@ -43,12 +43,25 @@ func (lock Lock) commit() {
 	if err != nil {
 		return
 	}
+	err = lock.file.Close()
+	if err != nil {
+		println("error while closing")
+	}
 	lock.file = nil
 }
 
-func (lock Lock) rollback() {
+func (lock Lock) rollback() bool{
 	lock.raiseOnStaleLock()
-
+	err := lock.file.Close()
+	if err != nil  {
+		return false
+	}
+	err = os.Remove(lock.filePath)
+	if err != nil {
+		println("error while deleting")
+	}
+	lock.file = nil
+	return true
 }
 
 func (lock Lock) raiseOnStaleLock() bool {

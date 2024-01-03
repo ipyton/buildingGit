@@ -10,7 +10,7 @@ type Tree struct {
 }
 
 func (tree Tree) getObjectType(objectType string) string {
-	return tree.objectType
+	return "tree"
 }
 
 func (tree Tree) toString() string {
@@ -33,4 +33,4 @@ func newTree(entries []Entry) Tree{
 	return Tree{objectType:"tree", mode: "100644", objects: entries}
 }
 
-
+func (tree Tree) traverse() {}

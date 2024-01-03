@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"main/utils"
 	"os"
 	"strings"
 )
@@ -45,6 +46,16 @@ func (entry Entry) toString() string {
 }
 
 func (entry Entry) parentDirectories() []string{
+	utils.GetAncestors(entry.name)
+}
 
+func (entry Entry) baseName() string {
+	split := strings.Split(entry.name, "/")
+	return split[len(split) - 1]
+}
+
+
+func (entry Entry) key() string {
+	return entry.objectId
 }
 
