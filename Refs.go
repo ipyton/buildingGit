@@ -15,7 +15,7 @@ func newRef(pathName string) Refs {
 	return Refs{pathname: pathName}
 }
 
-func (ref Refs) updateHead(objectId string) (error) {
+func (ref Refs) updateHead(objectId string) error {
 	lock := newLock(ref.getHeadPath())
 	if !lock.lock(){
 		return errors.New("lock could not be acquired exist")

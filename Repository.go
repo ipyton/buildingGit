@@ -1,7 +1,8 @@
 package main
 
-struct Repository {
-
+type Repository struct{
+	index Index
+	refs Refs
 }
 
 func newRepository() {
