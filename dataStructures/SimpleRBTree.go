@@ -144,19 +144,6 @@ func (rbTree * RBTree) deleteMin() {
 	}
 }
 
-func (rbTree * RBTree) recursivelyDeleteMax(node * TreeNode) {
-
-}
-
-func (rbTree * RBTree) deleteMax() {
-
-}
-
-
-func (rbTree * RBTree) delete() {
-
-}
-
 func rotateLeft(node * TreeNode) * TreeNode {
 	right := node.right
 	node.right = right.left
@@ -180,12 +167,45 @@ func rotateRight(node * TreeNode) * TreeNode {
 	return left
 }
 
+func (rbTree * RBTree) moveRedRight(node * TreeNode) * TreeNode{
+	reverseFlipColors(node)
+	if !node.left.left.isBlack() {
+		node = rotateRight(node)
+	}
+	return node
+}
 
+func (rbTree * RBTree) recursivelyDeleteMax(node * TreeNode) * TreeNode {
+	if node.left.isBlack() && node.right.isBlack() {
+		node.black = false
+	}
+	if node.right == nil {
+		return nil
+	}
+	if node.right.isBlack() && node.right.left.isBlack() {
+		node = rbTree.moveRedRight(node)
+	}
 
+	node.right = rbTree.recursivelyDeleteMax(node.right)
+	return rbTree.balance(node)
+}
 
+func (rbTree * RBTree) deleteMax() {
+	if !rbTree.root.left.isBlack() && !rbTree.root.right.isBlack() {
+		rbTree.root.black = false
+	}
+	rbTree.root = rbTree.recursivelyDeleteMax(rbTree.root.right)
+	if !rbTree.root.isEmpty() {
+		rbTree.root.black = true
+	}
+}
 
+func (rBTree * RBTree) recursivelyDelete(){
 
+}
 
+func (rbTree * RBTree) delete() {
 
+}
 
 

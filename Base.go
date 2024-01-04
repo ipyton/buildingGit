@@ -3,7 +3,7 @@ package main
 
 type Base struct {
 	dir string
-	args []string
+	args map[string] string
 	repository Repository
 	parseOptions []string
 }

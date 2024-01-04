@@ -28,19 +28,10 @@ func ShortStatus() map[string]string {
 
 func (status Status) run() {
 	status.repository.index.loadForUpdate()
-
-	status.scanWorkspace()
-	status.loadHeadTree()
-
-	//status.detectWorkspaceChanges()
-	status.checkIndexEntries()
-
-	status.repository.index.writeUpdates()
-}
-
-func (status Status) printResults() {
+	status.printResults()
 
 }
+
 
 func (status Status) loadHeadTree() {
 	headOid :=status.repository.refs.readHead()
@@ -66,6 +57,14 @@ func (status Status) printPorcelainFormat() {
 
 }
 
+func (status Status) printResults() {
+	if status.args["format"] == "long" {
+		status.printLongFormat()
+	} else if status.args["format"] == "porcelain" {
+		status.printPorcelainFormat()
+	}
+}
+
 func (status Status) statusFor(path string) string {
 	changes := status.changes[path]
 	left := ""
@@ -83,18 +82,3 @@ func (status Status) statusFor(path string) string {
 	return left + right
 }
 
-func (status Status) scanWorkspace() {
-
-}
-
-func (status Status) detectWorkspaceChanges() {
-
-}
-
-func (status Status) checkIndexEntries(entry Entry) {
-
-}
-
-func (status Status) recordChange() {
-
-}
