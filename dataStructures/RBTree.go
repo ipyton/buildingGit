@@ -41,11 +41,14 @@ func size(node * TreeNode) int {
 
 
 type RBTree struct {
-	compare func()
+	compare func(string, string) int
+	root * TreeNode
 }
 
 func flipColors(tree * TreeNode) {
-
+	tree.left.black = true
+	tree.right.black = true
+	tree.black = false
 }
 
 func compare(a string, b string) int {
@@ -57,19 +60,20 @@ func compare(a string, b string) int {
 	return 0
 }
 
-func (rbTree * RBTree) putRecursively(key string, value string){
-
+func (rbTree * RBTree) put(key string, value string){
+	node := rbTree.putRecursively(rbTree.root, key, value)
+	node.black = true
 }
 
-func (rbTree * RBTree) put(tree * TreeNode, key string, value string) * TreeNode{
+func (rbTree * RBTree) putRecursively(tree * TreeNode, key string, value string) * TreeNode{
 	if tree == nil {
 		return newTreeNode(key,value, 1, false)
 	}
 	result := compare(tree.key, key)
 	if result < 0 {
-		tree.left = rbTree.put(tree.left, key, value)
+		tree.left = rbTree.putRecursively(tree.left, key, value)
 	} else if result > 0{
-		tree.right = rbTree.put(tree.right, key, value)
+		tree.right = rbTree.putRecursively(tree.right, key, value)
 	} else {
 		tree.value = value
 	}
@@ -88,13 +92,66 @@ func (rbTree * RBTree) put(tree * TreeNode, key string, value string) * TreeNode
 	return tree
 }
 
-func (rbTree * RBTree) deleteMin(){
+func (node * TreeNode) isEmpty() bool {
+	if node.n == 0{
+		return true
+	}
+	return false
+}
+
+func reverseFlipColors(tree * TreeNode) {
+	tree.left.black = false
+	tree.right.black = false
+	tree.black = true
+}
+
+func moveRedLeft(treeNode * TreeNode) * TreeNode{
+	reverseFlipColors(treeNode)
+	if !treeNode.right.left.isBlack() { // sibling node is not 2 node
+		treeNode.right = rotateRight(treeNode.right)
+		treeNode = rotateLeft(treeNode)
+	}
+	// if not just regard the
+	return treeNode
+}
+func (rbTree *RBTree) balance(node * TreeNode) *TreeNode{
+	if !node.right.isBlack() {
+		node = rotateLeft(node)
+	}
+	return node
+}
+
+func (rbTree * RBTree) recursivelyDeleteMin(node * TreeNode) * TreeNode {
+	if node.left == nil {
+		return nil
+	}
+	//left son is 2 node
+	if node.left.isBlack() && node.left.left.isBlack() {
+		node = moveRedLeft(node)
+	}
+
+	node.left = rbTree.recursivelyDeleteMin(node.left)
+	return rbTree.balance(node)
+}
+
+func (rbTree * RBTree) deleteMin() {
+	if rbTree.root.left.isBlack() && rbTree.root.right.isBlack() {
+		rbTree.root.black = false
+	}
+	rbTree.root = rbTree.recursivelyDeleteMin(rbTree.root)
+	if rbTree.root.isEmpty(){
+		rbTree.root.black = true
+	}
+}
+
+func (rbTree * RBTree) recursivelyDeleteMax(node * TreeNode) {
 
 }
 
 func (rbTree * RBTree) deleteMax() {
 
 }
+
 
 func (rbTree * RBTree) delete() {
 
