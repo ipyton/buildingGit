@@ -51,9 +51,9 @@ func (this Index) clear() bool {
 
 
 func (this Index) add(pathName string, oid string, state os.FileInfo) {
-	entry := newEntry(pathName, oid, state)
-	this.entries[pathName] = &entry
-	this.changed = true
+	//entry := newEntry(pathName, oid, state)
+	//this.entries[pathName] = &entry
+	//this.changed = true
 
 }
 
@@ -222,17 +222,17 @@ func (this Index) removeChildren(path string) {
 }
 
 func (this Index) removeEntry(name string){
-	if this.entries[name] == nil {
-		return
-	}
-	entry := this.entries[name]
-	this.keys.Remove(name)
-	delete(this.entries, name)
-	directories := entry.parentDirectories()
-	for _, directory := range directories {
-		this.parentDirectory[directory].remove(entry.path)
-		//delete the struct in the parent directory.
-	}
+	//if this.entries[name] == nil {
+	//	return
+	//}
+	//entry := this.entries[name]
+	//this.keys.Remove(name)
+	//delete(this.entries, name)
+	//directories := entry.parentDirectories()
+	//for _, directory := range directories {
+	//	//this.parentDirectory[directory].remove(entry.path)
+	//	//delete the struct in the parent directory.
+	//}
 }
 
 func (this Index) isTracked(key string) bool {

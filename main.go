@@ -6,6 +6,7 @@ import (
 	"os"
 	path2 "path"
 	"time"
+	"main/dataStructures"
 )
 
 func init(){
@@ -75,7 +76,7 @@ func handleInit(path string) {
 }
 
 func handleCommit(path string){
-	entries :=make([]Entry,0)
+	entries := make([]*Entry,0)
 	gitPath := path2.Join(path,".git")
 	objectsPath := path2.Join(gitPath, "objects")
 	fmt.Println(objectsPath)
@@ -87,7 +88,7 @@ func handleCommit(path string){
 		data := readFile(filePath)
 		object := newObject(data,"blob")
 		database.write(object)
-		entries = append(entries, Entry{name: filePath, objectId: object.id})
+		entries = append(entries, &Entry{name: filePath, objectId: object.id})
 	}
 
 	tree := newTree(entries)
@@ -119,6 +120,8 @@ func handleStatus() {
 func main(){
 	//commandDispatcher("commit")
 	//writeToDisk()
+
+
 
 
 }
