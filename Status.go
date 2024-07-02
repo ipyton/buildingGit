@@ -1,30 +1,38 @@
 package main
 
+import index2 "buildinggit/index"
+
 type Status struct {
 	untracked []string
-	changes map[string] []string
+	changes   map[string][]string
 	Base
 }
 
-
 func LongStatus() map[string]string {
-	m := map[string]string {
-		"added" : "new file:",
-		"deleted" : "deleted:",
-		"modified" : "modified:",
+	m := map[string]string{
+		"added":    "new file:",
+		"deleted":  "deleted:",
+		"modified": "modified:",
 	}
 	return m
 }
 
 func ShortStatus() map[string]string {
-	m := map[string]string {
-		"added" : "A",
-		"deleted" : "D",
-		"modified" : "M",
+	m := map[string]string{
+		"added":    "A",
+		"deleted":  "D",
+		"modified": "M",
 	}
 	return m
 }
 
+func check_index_entry(entry index2.Entry) {
+
+}
+
+func recordChange() {
+
+}
 
 func (status Status) run() {
 	status.repository.index.loadForUpdate()
@@ -32,9 +40,8 @@ func (status Status) run() {
 
 }
 
-
 func (status Status) loadHeadTree() {
-	headOid :=status.repository.refs.readHead()
+	headOid := status.repository.refs.readHead()
 	if len(headOid) == 0 {
 		return
 	}
@@ -74,11 +81,10 @@ func (status Status) statusFor(path string) string {
 			left = "A"
 		}
 		if value == "workspace_deleted" {
-			 right = "D"
+			right = "D"
 		} else if value == "workspace_modified" {
 			right = "M"
 		}
 	}
 	return left + right
 }
-

@@ -1,33 +1,30 @@
 package main
 
 import (
+	index2 "buildinggit/index"
 	"crypto/sha1"
-	"github.com/wangjia184/sortedset"
 	"hash"
-	"main/utils"
 	"os"
 	"strconv"
 	"strings"
 )
 
-
 type Index struct {
-	file * os.File
-	path string
-	lock Lock
-	entries map[string] *Entry
-	keys * sortedset.SortedSet
-	sha1Digest    hash.Hash
-	HeaderSize   int
-	HeaderFormat string
-	Signature    string
-	Version int
-	changed bool
-	EntryMinSize int
-	EntryBlock int
-	parentDirectory map[string] []string
+	file            *os.File
+	path            string
+	lock            Lock
+	entries         map[string]*index2.Entry
+	keys            *sortedset.SortedSet
+	sha1Digest      hash.Hash
+	HeaderSize      int
+	HeaderFormat    string
+	Signature       string
+	Version         int
+	changed         bool
+	EntryMinSize    int
+	EntryBlock      int
+	parentDirectory map[string][]string
 }
-
 
 func newIndex(path string) Index {
 	open, _ := os.Open(path)
@@ -49,7 +46,6 @@ func (this Index) clear() bool {
 	return true
 }
 
-
 func (this Index) add(pathName string, oid string, state os.FileInfo) {
 	//entry := newEntry(pathName, oid, state)
 	//this.entries[pathName] = &entry
@@ -57,8 +53,7 @@ func (this Index) add(pathName string, oid string, state os.FileInfo) {
 
 }
 
-
-//lock for update.
+// lock for update.
 func (this Index) loadForUpdate() bool {
 	if this.lock.lock() {
 		this.load(this.path)
@@ -69,7 +64,7 @@ func (this Index) loadForUpdate() bool {
 
 func (this Index) openIndexFile(path string) bool {
 	indexFile, openError := os.OpenFile(path, os.O_RDONLY, 777)
-	if openError != nil{
+	if openError != nil {
 		this.file = indexFile
 		return true
 	}
@@ -89,12 +84,10 @@ func (this Index) load(path string) {
 
 }
 
-
-func (this Index) write(data string)  {
+func (this Index) write(data string) {
 	this.lock.write(data)
 	this.sha1Digest.Write([]byte(data))
 }
-
 
 func (this Index) finishWrite() {
 	this.lock.write(string(this.sha1Digest.Sum(nil)))
@@ -102,24 +95,21 @@ func (this Index) finishWrite() {
 
 }
 
-
 func (Index) getCheckSumLength() int {
 	return 20
 }
 
-func (this Index) read(size int) []byte{
+func (this Index) read(size int) []byte {
 	var result []byte
 	this.file.Read(result)
 	return result
 }
-
 
 //func (this Index) checkSum() bool {
 //	read := this.read(this.getCheckSumLength())
 //
 //	return true
 //}
-
 
 func (this Index) writeUpdates() bool {
 	if this.changed {
@@ -139,8 +129,6 @@ func (this Index) writeUpdates() bool {
 	return true
 }
 
-
-
 func (this Index) readHeader(file os.File) int {
 	buffer := make([]byte, this.HeaderSize)
 	read, err := file.Read(buffer)
@@ -148,7 +136,7 @@ func (this Index) readHeader(file os.File) int {
 		return -1
 	}
 	split := strings.Split(string(buffer), "@")
-	signature, versionString, countString := split[0],split[1], split[2]
+	signature, versionString, countString := split[0], split[1], split[2]
 	version, err := strconv.Atoi(versionString)
 	if signature != this.Signature || version != this.Version {
 		return -1
@@ -160,35 +148,35 @@ func (this Index) readHeader(file os.File) int {
 	return count
 }
 
-//this one should be changed
+// this one should be changed
 func (this Index) readEntries(file os.File, count int) bool {
-	for i := 0; i < count; i ++ {
+	for i := 0; i < count; i++ {
 		buffer := make([]byte, this.EntryMinSize, this.EntryMinSize)
 		size, err := file.Read(buffer)
 		for {
-			if buffer[size - 1] != '\n' {
+			if buffer[size-1] != '\n' {
 				appendBuffer := make([]byte, 8, 8)
 				size, err := file.Read(appendBuffer)
 				if size != 0 || err != nil {
 					return false
 				}
-				buffer = append(buffer,appendBuffer...)
+				buffer = append(buffer, appendBuffer...)
 			} else {
 				break
 			}
 		}
-		if  err != nil {
+		if err != nil {
 			return false
 		}
-		entry := parseEntryFromBytes(buffer)
+		entry := index2.parseEntryFromBytes(buffer)
 		this.storeEntry(entry)
 	}
 	return true
 
 }
 
-func (this Index) storeEntry(entry Entry) {
-	this.keys.AddOrUpdate(entry.key(),20 ,nil)
+func (this Index) storeEntry(entry index2.Entry) {
+	this.keys.AddOrUpdate(entry.key(), 20, nil)
 	// this.keys = append(this.keys, entry.key)
 	this.entries[entry.key()] = &entry
 	parents := utils.GetAncestors(entry.path)
@@ -197,13 +185,14 @@ func (this Index) storeEntry(entry Entry) {
 	}
 }
 
-func (this Index) opEachEntry(op func(entry *Entry)) {
-	for _,v := range this.entries {
+func (this Index) opEachEntry(op func(entry *index2.Entry)) {
+	for _, v := range this.entries {
 		op(v)
 	}
 }
 
-func (this Index) discardConflicts(entry Entry){
+func (this Index) discardConflicts(entry index2.Entry) {
+	//
 	for _, directory := range entry.parentDirectories() {
 		this.keys.Remove(entry.key())
 		delete(this.entries, directory)
@@ -211,6 +200,7 @@ func (this Index) discardConflicts(entry Entry){
 }
 
 func (this Index) removeChildren(path string) {
+	//
 	if this.parentDirectory[path] == nil {
 		return
 	}
@@ -221,7 +211,8 @@ func (this Index) removeChildren(path string) {
 	}
 }
 
-func (this Index) removeEntry(name string){
+func (this Index) removeEntry(name string) {
+	//
 	//if this.entries[name] == nil {
 	//	return
 	//}
@@ -236,9 +227,16 @@ func (this Index) removeEntry(name string){
 }
 
 func (this Index) isTracked(key string) bool {
+	// return if a file is tracked.
 	return this.entries[key] != nil
 }
 
+func (this Index) create() {
+
+}
+func (this Index) mode_for_stat() {
+
+}
 
 func basename() {
 

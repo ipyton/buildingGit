@@ -6,30 +6,35 @@ import (
 )
 
 type Workspace struct {
-	path string
-	ignore []string
+	path   string
+	ignore map[string]bool
 }
 
-func (workspace Workspace) init(path string, ignore []string)  {
-	workspace.ignore = ignore
+// manipulating the files in directory
+//
+
+func (workspace Workspace) init(path string) {
+	workspace.ignore[".gitignore"] = true
+	workspace.ignore["."] = true
+	workspace.ignore[".."] = true
+
 	workspace.path = path
 }
 
-
-
-func listFilesByPath(targetPath string) []string{
+func listFilesByPath(targetPath string) []string {
+	//get all files recursively in target path.
 	var result []string
 	queue := make([]string, 0)
 	queue = append(queue, targetPath)
 	for {
-		if 0 == len(queue){
+		if 0 == len(queue) {
 			break
 		}
 		basePath := queue[0]
 		stat, _ := os.Stat(basePath)
 		if stat.IsDir() {
 			dirs, _ := os.ReadDir(basePath)
-			for _,dir := range dirs {
+			for _, dir := range dirs {
 				queue = append(queue, path.Join(basePath, dir.Name()))
 			}
 		} else {
@@ -40,18 +45,27 @@ func listFilesByPath(targetPath string) []string{
 	return result
 }
 
-
-func (workspace Workspace) listFiles() []string  {
+func (workspace Workspace) listFiles() []string {
 	return listFilesByPath(workspace.path)
 }
 
-func readFile(path string) []byte{
+func (workspace Workspace) listDirs(targetPath string) map[string]os.FileInfo {
+	dir, _ := os.ReadDir(targetPath)
+	hashmap := make(map[string]os.FileInfo)
+	for _, file := range dir {
+		if !workspace.ignore[file.Name()] {
+			hashmap[file.Name()], _ = file.Info()
+		}
+	}
+	return hashmap
+}
+func readFile(path string) []byte {
 	file, _ := os.ReadFile(path)
 	return file
 
 }
 
-func statFile(path string) os.FileInfo{
+func statFile(path string) os.FileInfo {
 	stat, _ := os.Stat(path)
 	return stat
 }

@@ -11,13 +11,16 @@ type Refs struct {
 	pathname string
 }
 
+// references of commits in repository.
+// and git stash
+
 func newRef(pathName string) Refs {
 	return Refs{pathname: pathName}
 }
 
 func (ref Refs) updateHead(objectId string) error {
 	lock := newLock(ref.getHeadPath())
-	if !lock.lock(){
+	if !lock.lock() {
 		return errors.New("lock could not be acquired exist")
 	}
 
@@ -44,6 +47,6 @@ func (ref Refs) readHead() string {
 	return ""
 }
 
-func (ref Refs) getHeadPath() string{
+func (ref Refs) getHeadPath() string {
 	return path.Join(ref.pathname, "HEAD")
 }

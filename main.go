@@ -1,40 +1,105 @@
 package main
 
+// This file is used to get the command from the console and dispatch to the functions.
 import (
+	index2 "buildinggit/index"
 	"fmt"
 	"io/fs"
 	"os"
 	path2 "path"
 	"time"
-	"main/dataStructures"
 )
 
-func init(){
+func init() {
 
 }
 
 func commandDispatcher(command string, args []string) {
 	path, _ := os.Getwd()
-	if command == "init" {
-		handleInit(path)
-	}
-	if command == "commit" {
-		handleCommit(path)
-	}
+
 	if command == "add" {
 		handleAdd(path, args)
 	}
-	if (command == "handle") {
+
+	if command == "handle" {
 		handleStatus()
+	}
+
+	if command == "branch" {
 
 	}
+
+	if command == "checkout" {
+
+	}
+
+	if command == "cherry_pick" {
+
+	}
+
+	if command == "commit" {
+		handleCommit(path)
+	}
+
+	if command == "config" {
+
+	}
+
+	if command == "diff" {
+
+	}
+
+	if command == "fetch" {
+
+	}
+
+	if command == "init" {
+		handleInit(path)
+	}
+
+	if command == "log" {
+
+	}
+
+	if command == "merge" {
+
+	}
+
+	if command == "push" {
+
+	}
+
+	if command == "receive_pack" {
+
+	}
+
+	if command == "rev_list" {
+
+	}
+
+	if command == "revert" {
+
+	}
+
+	if command == "rm" {
+
+	}
+
+	if command == "status" {
+
+	}
+
+	if command == "upload_pack" {
+
+	}
+
 }
 
 func handleAdd(path string, args []string) {
 	if len(args) != 1 {
 		fmt.Println("needs an argument!")
 	}
-	gitPath := path2.Join(path,".git")
+	gitPath := path2.Join(path, ".git")
 	// objectsPath := path2.Join(gitPath, "objects")
 	//workspace := Workspace{path: path,
 	//	ignore: []string{".", "..", ".git"}}
@@ -57,13 +122,14 @@ func handleAdd(path string, args []string) {
 }
 
 func handleInit(path string) {
+	// create paths needed
 	path = path2.Join(path, ".git")
 	err := os.Mkdir(path, os.FileMode(777))
 	if err != nil {
 		return
 	}
-	var folders  = [...]string{"objects","refs"}
-	for _,v :=range folders {
+	var folders = [...]string{"objects", "refs"}
+	for _, v := range folders {
 		fmt.Println(v)
 		nPath := path2.Join(path, v)
 		fmt.Println(nPath)
@@ -73,11 +139,15 @@ func handleInit(path string) {
 			return
 		}
 	}
+	// create configuration file
+
+	// refs
+
 }
 
-func handleCommit(path string){
-	entries := make([]*Entry,0)
-	gitPath := path2.Join(path,".git")
+func handleCommit(path string) {
+	entries := make([]*index2.Entry, 0)
+	gitPath := path2.Join(path, ".git")
 	objectsPath := path2.Join(gitPath, "objects")
 	fmt.Println(objectsPath)
 	workspace := Workspace{path: path,
@@ -86,16 +156,16 @@ func handleCommit(path string){
 	database := newDatabase(objectsPath)
 	for _, filePath := range files {
 		data := readFile(filePath)
-		object := newObject(data,"blob")
+		object := newObject(data, "blob")
 		database.write(object)
-		entries = append(entries, &Entry{name: filePath, objectId: object.id})
+		entries = append(entries, &index2.Entry{name: filePath, objectId: object.id})
 	}
 
 	tree := newTree(entries)
 	object := Object{kind: "tree", content: []byte(tree.toString())}
 	database.write(object)
-	name := os.Getenv("GIT_AUTHOR_NAME")
-	email := os.Getenv("GIT_AUTHOR_EMAIL")
+	name := os.Getenv("JIT_AUTHOR_NAME")
+	email := os.Getenv("JIT_AUTHOR_EMAIL")
 	author := newAuthor(name, email)
 	var message string
 	fmt.Scanln(&message)
@@ -103,7 +173,7 @@ func handleCommit(path string){
 	ref := newRef(gitPath)
 	parent := ref.readHead()
 
-	commit := newCommit(object.id,author, message,time.Now(), parent)
+	commit := newCommit(object.id, author, message, time.Now(), parent)
 	commitObject := Object{kind: "commit", content: []byte(commit.toString())}
 	database.write(commitObject)
 	headPath := path2.Join(gitPath, "HEAD")
@@ -111,17 +181,12 @@ func handleCommit(path string){
 	file.Write([]byte("(root-commit) " + commitObject.id + commit.treeId))
 }
 
-
 func handleStatus() {
 
 }
 
-
-func main(){
+func main() {
 	//commandDispatcher("commit")
 	//writeToDisk()
-
-
-
 
 }

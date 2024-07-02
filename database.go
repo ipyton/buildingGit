@@ -14,6 +14,7 @@ import (
 type Database struct {
 	path string
 }
+
 func newDatabase(path string) Database {
 	return Database{path: path}
 }
@@ -27,12 +28,26 @@ func (d Database) write(object Object) {
 	d.writeToDisk(sum, object.content)
 }
 
-func (d Database)processWrite(tree Tree)  {
+func (d Database) processWrite(tree Tree) {
 
 }
 
+func store() {
 
-func (d Database) writeToDisk(id [20]byte, content []byte) (error){
+}
+
+func hash_object() {
+
+}
+
+func serialize_object() {
+
+}
+func hash_content() {
+
+}
+
+func (d Database) writeToDisk(id [20]byte, content []byte) error {
 	//var in bytes.Buffer
 	//writer := zlib.NewWriter(&in)
 	//writer.Write([]byte())
@@ -40,7 +55,7 @@ func (d Database) writeToDisk(id [20]byte, content []byte) (error){
 	s := string(id[0]) + string(id[1])
 	fileNameByte := id[2:]
 	fileName := ""
-	for b :=range fileNameByte {
+	for b := range fileNameByte {
 		fileName += string(b)
 	}
 	_, err2 := os.Stat(fileName)
@@ -61,14 +76,14 @@ func (d Database) writeToDisk(id [20]byte, content []byte) (error){
 	return nil
 }
 
-func readRawToBlob(path string){
+func readRawToBlob(path string) {
 
 }
 
 func readObject(path string) {
 	var out bytes.Buffer
 	open, _ := os.Open(path)
-	r, _:=zlib.NewReader(open)
+	r, _ := zlib.NewReader(open)
 	io.Copy(&out, r)
 
 }
