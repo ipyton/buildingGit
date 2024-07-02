@@ -8,5 +8,5 @@ It supports some basic functions of git.
 ./remote is used to communicate with the remote repository.
 
 
-the order of implementation. init,add,commit. status
+the order of implementation. init,add,commit. status, checkout
 repository contains config database, almost everything

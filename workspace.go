@@ -17,7 +17,6 @@ func (workspace Workspace) init(path string) {
 	workspace.ignore[".gitignore"] = true
 	workspace.ignore["."] = true
 	workspace.ignore[".."] = true
-
 	workspace.path = path
 }
 
@@ -59,10 +58,21 @@ func (workspace Workspace) listDirs(targetPath string) map[string]os.FileInfo {
 	}
 	return hashmap
 }
-func readFile(path string) []byte {
-	file, _ := os.ReadFile(path)
-	return file
 
+func (workspace Workspace) readFile(target string) []byte {
+	file, _ := os.ReadFile(path.Join(workspace.path, target))
+	return file
+}
+
+func (workspace Workspace) writeFile(path string, data string, mode os.FileMode, mkdir bool) {
+
+}
+
+func (workspace Workspace) removeFiles(target string) {
+	err := os.RemoveAll(target)
+	if err != nil {
+		println("error while removing")
+	}
 }
 
 func statFile(path string) os.FileInfo {

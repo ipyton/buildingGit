@@ -1,5 +1,4 @@
-package main
+package diff
 
 type Hunk struct {
-
 }

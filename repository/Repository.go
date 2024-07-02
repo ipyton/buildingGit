@@ -1,8 +1,11 @@
-package main
+package repository
 
-type Repository struct{
-	index Index
-	refs Refs
+import "buildinggit"
+
+type Repository struct {
+	gitPath string
+	index   main.Index
+	refs    main.Refs
 }
 
 func newRepository() {
@@ -52,4 +55,3 @@ func status() {
 func workspace() {
 
 }
-
