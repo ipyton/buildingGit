@@ -59,7 +59,7 @@ func (workspace Workspace) listDirs(targetPath string) map[string]os.FileInfo {
 	return hashmap
 }
 
-func (workspace Workspace) readFile(target string) []byte {
+func (workspace Workspace) ReadFile(target string) []byte {
 	file, _ := os.ReadFile(path.Join(workspace.path, target))
 	return file
 }
@@ -68,14 +68,30 @@ func (workspace Workspace) writeFile(path string, data string, mode os.FileMode,
 
 }
 
-func (workspace Workspace) removeFiles(target string) {
+func (workspace Workspace) removeDirectory(target string) {
+	// remove all things including directory
 	err := os.RemoveAll(target)
 	if err != nil {
 		println("error while removing")
 	}
 }
 
-func statFile(path string) os.FileInfo {
-	stat, _ := os.Stat(path)
+func (workspace Workspace) remove(target string) {
+	// remove a single file
+	targetPath := path.Join(workspace.path, target)
+	os.Remove(targetPath)
+
+	//If the folder contains the file, after deletion it became to empty, delete its parent folder.
+	dirs, _ := os.ReadDir(targetPath)
+	for _, dir := range dirs {
+		if dir.IsDir() {
+			workspace.removeDirectory(dir.Name())
+		}
+	}
+
+}
+
+func (workspace *Workspace) StatFile(targetPath string) os.FileInfo {
+	stat, _ := os.Stat(path.Join(workspace.path, targetPath))
 	return stat
 }

@@ -3,9 +3,11 @@ package repository
 import "buildinggit"
 
 type Repository struct {
-	gitPath string
-	index   main.Index
-	refs    main.Refs
+	gitPath   string
+	Index     main.Index
+	Workspace main.Workspace
+	Database  main.Database
+	refs      main.Refs
 }
 
 func newRepository() {

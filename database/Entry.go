@@ -1,5 +1,6 @@
 package database
 
+// Entry for database
 type Entry struct {
 	oid  string
 	mode string

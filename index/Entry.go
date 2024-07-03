@@ -3,6 +3,7 @@ package index
 //used to
 import (
 	"buildinggit"
+	"buildinggit/repository"
 	"encoding/json"
 	"main/utils"
 	"os"
@@ -13,40 +14,42 @@ import (
 var REGULAR_MODE string = "100644"
 var EXECUTABLE_MODE string = "100755"
 
+const ENTRY_FORMAT string = "N10H40nZ*"
+
 type Entry struct {
-	name     string
-	objectId string
-	stat     *main.FileInfo
-	path     string
-	ctime    time.Time
-
-	mtime time.Time
-	ENTRY_FORMAT
+	name  string
+	OId   []byte
+	Stat  *main.FileInfo
+	Path  string
+	ctime *time.Time
+	size  int64
+	mtime *time.Time
 }
 
-func newEntry(name string, objectId string, stat *main.FileInfo) *Entry {
+func newEntry(name string, objectId []byte, stat *main.FileInfo) *Entry {
 
-	return &Entry{name: name, objectId: objectId, stat: stat}
+	return &Entry{name: name, OId: objectId, Stat: stat}
 }
 
-func update_stat(stat) {
+func UpdateStatus(stat repository.Status) {
 
 }
 
 func parseEntryFromBytes(bytes []byte) Entry {
+	// deserialize the entries from []byte.
 	s := string(bytes)
 	splits := strings.Split(s, " ")
 	var result os.FileInfo
 	err := json.Unmarshal(bytes[24:], &result)
-	info := main.parseFileInfo(string(bytes[24:]))
+	info := main.ParseFileInfo(string(bytes[24:]))
 	if err != nil {
-		return Entry{name: splits[0], objectId: splits[1], stat: info}
+		return Entry{name: splits[0], OId: []byte(splits[1]), Stat: info}
 	}
 	return Entry{}
 }
 
 func (entry Entry) mode() string {
-	if entry.stat.mode > 111 {
+	if entry.Stat.Mode > 111 {
 		return EXECUTABLE_MODE
 	}
 	return REGULAR_MODE
@@ -54,10 +57,10 @@ func (entry Entry) mode() string {
 }
 
 func (entry Entry) toString() string {
-	return entry.name + " __ " + entry.objectId + "__" + entry.stat.name + "\n"
+	return entry.name + " __ " + string(entry.OId) + "__" + entry.Stat.Name + "\n"
 }
 
-func (entry Entry) parentDirectories() []string {
+func (entry Entry) ParentDirectories() []string {
 	return utils.GetAncestors(entry.name)
 }
 
@@ -66,17 +69,22 @@ func (entry Entry) baseName() string {
 	return split[len(split)-1]
 }
 
-func (entry Entry) key() string {
-	return entry.objectId
+func (entry Entry) key() []byte {
+	return entry.OId
 }
 
-func (entry Entry) statMatch() {
-
+func (entry Entry) StatMatch(stat os.FileInfo) bool {
+	return entry.mode() == stat.Mode().String() && (entry.size == 0 || entry.size == stat.Size())
 }
 
 func parseEntry(entry string) *Entry {
 	split := strings.Split(entry, "__")
-	return newEntry(split[0], split[1], main.parseFileInfo(split[2]))
+	return newEntry(split[0], []byte(split[1]), main.ParseFileInfo(split[2]))
 
 }
-func time_match()
+func (entry Entry) TimesMatch(stat os.FileInfo) bool {
+	if entry.ctime == nil {
+		return stat.ModTime().Equal(*entry.mtime)
+	}
+	return stat.ModTime().Equal(*entry.mtime)
+}

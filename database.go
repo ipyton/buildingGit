@@ -1,6 +1,7 @@
 package main
 
 import (
+	"buildinggit/database"
 	"bytes"
 	"compress/zlib"
 	"crypto/sha1"
@@ -13,6 +14,7 @@ import (
 
 type Database struct {
 	path string
+	objects map[string]*Object
 }
 
 func newDatabase(path string) Database {
@@ -28,6 +30,8 @@ func (d Database) write(object Object) {
 	d.writeToDisk(sum, object.content)
 }
 
+
+
 func (d Database) processWrite(tree Tree) {
 
 }
@@ -36,8 +40,8 @@ func store() {
 
 }
 
-func hash_object() {
-
+func (d Database) HashObject(object []byte) [20]byte {
+	return sha1.Sum(object)
 }
 
 func serialize_object() {
@@ -89,5 +93,19 @@ func readObject(path string) {
 }
 
 func generateTempName() {
+
+}
+
+func (db* Database) load(oid [20]byte) {
+	if db.objects
+
+}
+
+func (db *Database) LoadTreeEntry(headOid [20]byte, targetPath string) {
+	commit := load(headOid)
+	root := database.NewEntry(commit.Tree)
+}
+
+func LoadTreeList(oid []byte) {
 
 }

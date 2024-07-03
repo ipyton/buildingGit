@@ -1,7 +1,9 @@
 package main
 
 import (
+	"buildinggit/entity"
 	index2 "buildinggit/index"
+	"buildinggit/utils"
 	"crypto/sha1"
 	"hash"
 	"os"
@@ -9,11 +11,18 @@ import (
 	"strings"
 )
 
+//this file is used to what kind of files(in hash) that a project include.
+
+const HEADER_SIZE = 12
+const HEADER_FORMAT = "a4N2"
+const SIGNATURE = "DIRC"
+const VERSION = 2
+
 type Index struct {
 	file            *os.File
 	path            string
 	lock            Lock
-	entries         map[string]*index2.Entry
+	entries         map[entity.EntryCompositeKey]*index2.Entry
 	keys            *sortedset.SortedSet
 	sha1Digest      hash.Hash
 	HeaderSize      int
@@ -54,7 +63,7 @@ func (this Index) add(pathName string, oid string, state os.FileInfo) {
 }
 
 // lock for update.
-func (this Index) loadForUpdate() bool {
+func (this Index) LoadForUpdate() bool {
 	if this.lock.lock() {
 		this.load(this.path)
 		return true
@@ -111,7 +120,7 @@ func (this Index) read(size int) []byte {
 //	return true
 //}
 
-func (this Index) writeUpdates() bool {
+func (this Index) WriteUpdates() bool {
 	if this.changed {
 		return this.lock.rollback()
 	}
@@ -168,7 +177,7 @@ func (this Index) readEntries(file os.File, count int) bool {
 		if err != nil {
 			return false
 		}
-		entry := index2.parseEntryFromBytes(buffer)
+		entry := index2.ParseEntryFromBytes(buffer)
 		this.storeEntry(entry)
 	}
 	return true
@@ -179,9 +188,9 @@ func (this Index) storeEntry(entry index2.Entry) {
 	this.keys.AddOrUpdate(entry.key(), 20, nil)
 	// this.keys = append(this.keys, entry.key)
 	this.entries[entry.key()] = &entry
-	parents := utils.GetAncestors(entry.path)
+	parents := utils.GetAncestors(entry.Path)
 	for _, path := range parents {
-		this.parentDirectory[path] = append(this.parentDirectory[path], entry.path)
+		this.parentDirectory[path] = append(this.parentDirectory[path], entry.Path)
 	}
 }
 
@@ -193,10 +202,15 @@ func (this Index) opEachEntry(op func(entry *index2.Entry)) {
 
 func (this Index) discardConflicts(entry index2.Entry) {
 	//
-	for _, directory := range entry.parentDirectories() {
+	for _, directory := range entry.ParentDirectories() {
 		this.keys.Remove(entry.key())
 		delete(this.entries, directory)
 	}
+}
+func (this Index) Remove(path string) {
+	this.removeEntry(path)
+	this.removeChildren(path)
+	this.changed = true
 }
 
 func (this Index) removeChildren(path string) {
@@ -226,16 +240,29 @@ func (this Index) removeEntry(name string) {
 	//}
 }
 
-func (this Index) isTracked(key string) bool {
+func (this Index) IsTrackedFile(key string) bool {
 	// return if a file is tracked.
 	return this.entries[key] != nil
+}
+
+func (this Index) IsTrackedDirectory(path string) bool {
+	return true
 }
 
 func (this Index) create() {
 
 }
+
 func (this Index) mode_for_stat() {
 
+}
+
+func (this Index) ChildPaths(targetPath string) []string {
+	return this.parentDirectory[targetPath]
+}
+
+func (this Index) EntryForPath(path string, stage int) {
+	this.entries
 }
 
 func basename() {

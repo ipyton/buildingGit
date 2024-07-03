@@ -12,7 +12,7 @@ type Author struct {
 	time  time.Time
 }
 
-func (Author) parse(content string) Author {
+func ParseAuthor(content string) Author {
 	splited := strings.Split(content, "")
 	name, email, mod_time := splited[0], splited[1], splited[2]
 	t, _ := time.Parse("", mod_time)

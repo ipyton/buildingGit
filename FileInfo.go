@@ -7,22 +7,20 @@ import (
 )
 
 type FileInfo struct {
-	name string
-	size int64
-	mode uint32
-	modeTime time.Time
-	isDir bool
+	Name     string
+	Size     int64
+	Mode     uint32
+	ModeTime time.Time
+	IsDir    bool
 }
-
 
 func NewFileInfo(name string, size int64, mode uint32, modeTime time.Time, isDir bool) *FileInfo {
-	return & FileInfo{name: name,size: size,mode: mode, modeTime: modeTime, isDir: isDir}
+	return &FileInfo{Name: name, Size: size, Mode: mode, ModeTime: modeTime, IsDir: isDir}
 }
 
-
-func parseFileInfo(info string) * FileInfo {
+func ParseFileInfo(info string) *FileInfo {
 	split := strings.Split(info, "_")
-	size, err := strconv.ParseInt(split[1],0,64)
+	size, err := strconv.ParseInt(split[1], 0, 64)
 	if err == nil {
 		return nil
 	}

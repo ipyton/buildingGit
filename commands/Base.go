@@ -1,6 +1,9 @@
 package commands
 
-import "os"
+import (
+	"buildinggit/repository"
+	"os"
+)
 
 type Base struct {
 	dir    string
@@ -10,6 +13,7 @@ type Base struct {
 	stdout *os.File
 	stderr *os.File
 	stdin  *os.File
+	Repo   repository.Repository
 }
 
 func (base *Base) newBase(dir string, env map[string]string, args []string) Base {
@@ -17,7 +21,7 @@ func (base *Base) newBase(dir string, env map[string]string, args []string) Base
 }
 
 func (base *Base) execute() {
-	os.Std
+
 }
 
 func (base *Base) repo() {
