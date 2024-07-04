@@ -1,6 +1,6 @@
 package main
 
-import index2 "buildinggit/index"
+import index2 "buildinggit/indexUtils"
 
 func (status Status) scanWorkspace() {
 

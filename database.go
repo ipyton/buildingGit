@@ -1,20 +1,18 @@
 package main
 
 import (
-	"buildinggit/database"
-	"bytes"
-	"compress/zlib"
+	"buildinggit/databaseUtils"
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
-	"io"
 	"os"
 	"path"
 )
 
 type Database struct {
-	path string
-	objects map[string]*Object
+	databaseUtils.Backends
+	path    string
+	objects map[[20]byte]*Object
 }
 
 func newDatabase(path string) Database {
@@ -30,9 +28,7 @@ func (d Database) write(object Object) {
 	d.writeToDisk(sum, object.content)
 }
 
-
-
-func (d Database) processWrite(tree Tree) {
+func (d Database) processWrite(tree databaseUtils.Tree) {
 
 }
 
@@ -84,26 +80,34 @@ func readRawToBlob(path string) {
 
 }
 
-func readObject(path string) {
-	var out bytes.Buffer
-	open, _ := os.Open(path)
-	r, _ := zlib.NewReader(open)
-	io.Copy(&out, r)
+//func readObject(path string) {
+//	var out bytes.Buffer
+//	open, _ := os.Open(path)
+//	r, _ := zlib.NewReader(open)
+//	io.Copy(&out, r)
+//
+//}
 
+func (db *Database) readObject(oid [20]byte) {
+	db.LoadRaw(oid)
 }
 
 func generateTempName() {
 
 }
 
-func (db* Database) load(oid [20]byte) {
-	if db.objects
+func (db *Database) load(oid [20]byte) databaseUtils.Commit {
+	//load files by object id
+	if db.objects[oid] == nil {
+		db.objects[oid] = readObject(oid)
+	}
+	return db.objects[oid]
 
 }
 
 func (db *Database) LoadTreeEntry(headOid [20]byte, targetPath string) {
-	commit := load(headOid)
-	root := database.NewEntry(commit.Tree)
+	commit := db.load(headOid)
+	root := databaseUtils.NewEntry(commit.Tree, databaseUtils.TREE_MODE)
 }
 
 func LoadTreeList(oid []byte) {

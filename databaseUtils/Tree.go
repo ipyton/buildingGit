@@ -1,8 +1,8 @@
-package main
+package databaseUtils
 
 import (
 	"bufio"
-	index2 "buildinggit/index"
+	index2 "buildinggit/indexUtils"
 	"sort"
 	"strings"
 )
@@ -18,7 +18,7 @@ func (tree Tree) getObjectType(objectType string) string {
 	return "tree"
 }
 
-func (tree Tree) toString() string {
+func (tree Tree) ToString() string {
 	tree.sortByName()
 	result := ""
 	for _, item := range tree.objects {
@@ -35,6 +35,7 @@ func (tree Tree) sortByName() {
 }
 
 func (tree Tree) parseTree(scanner bufio.Scanner) string {
+	// read from file and go back
 	entries := make(map[string]string)
 
 	for scanner.Scan() {

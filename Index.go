@@ -1,9 +1,9 @@
 package main
 
 import (
-	"buildinggit/entity"
-	index2 "buildinggit/index"
-	"buildinggit/utils"
+	"buildinggit/entities"
+	index2 "buildinggit/indexUtils"
+	"buildinggit/util"
 	"crypto/sha1"
 	"hash"
 	"os"
@@ -22,7 +22,7 @@ type Index struct {
 	file            *os.File
 	path            string
 	lock            Lock
-	entries         map[entity.EntryCompositeKey]*index2.Entry
+	entries         map[entities.EntryCompositeKey]*index2.Entry
 	keys            *sortedset.SortedSet
 	sha1Digest      hash.Hash
 	HeaderSize      int
@@ -188,7 +188,7 @@ func (this Index) storeEntry(entry index2.Entry) {
 	this.keys.AddOrUpdate(entry.key(), 20, nil)
 	// this.keys = append(this.keys, entry.key)
 	this.entries[entry.key()] = &entry
-	parents := utils.GetAncestors(entry.Path)
+	parents := util.GetAncestors(entry.Path)
 	for _, path := range parents {
 		this.parentDirectory[path] = append(this.parentDirectory[path], entry.Path)
 	}

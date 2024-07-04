@@ -11,7 +11,7 @@ type Refs struct {
 	pathname string
 }
 
-// references of commits in repository.
+// references of commits in repositoryUtils.
 // and git stash
 
 func newRef(pathName string) Refs {

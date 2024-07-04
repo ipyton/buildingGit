@@ -1,6 +1,6 @@
-package database
+package databaseUtils
 
-// Entry for database
+// Entry for databaseUtils
 type Entry struct {
 	oid  string
 	mode string

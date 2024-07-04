@@ -1,4 +1,4 @@
-package database
+package databaseUtils
 
 import (
 	"bufio"
@@ -9,14 +9,14 @@ import (
 )
 
 type Commit struct {
-	parents   []string
-	tree      string
-	author    Author
-	committer Author
-	message   string
+	Parents   []string
+	Tree      string
+	Author    Author
+	Committer Author
+	Message   string
 }
 
-func Parse(reader bufio.Reader) *Commit {
+func ParseCommit(reader bufio.Reader) *Commit {
 	headers := make(map[string][]string)
 	for {
 		line, err := reader.ReadString('\n')
@@ -41,25 +41,25 @@ func Parse(reader bufio.Reader) *Commit {
 
 	message, _ := reader.ReadString(0)
 
-	return &Commit{committer: ParseAuthor(headers["author"][0]), author: ParseAuthor(headers["committer"][0]),
-		parents: headers["parent"], tree: headers["tree"][0], message: message}
+	return &Commit{Committer: ParseAuthor(headers["author"][0]), Author: ParseAuthor(headers["committer"][0]),
+		Parents: headers["parent"], Tree: headers["tree"][0], Message: message}
 }
 
 // merge needed?
 func (commit *Commit) NeedMerge() bool {
-	return len(commit.parents) > 1
+	return len(commit.Parents) > 1
 }
 
 func (commit *Commit) Parent() string {
-	return commit.parents[0]
+	return commit.Parents[0]
 }
 
 func (commit *Commit) Date() time.Time {
-	return commit.committer.time
+	return commit.Committer.time
 }
 
 func (commit *Commit) TitleLine() string {
-	return commit.message
+	return commit.Message
 }
 
 func (commit *Commit) Type() string {
@@ -68,14 +68,13 @@ func (commit *Commit) Type() string {
 }
 func (commit *Commit) ToS() string {
 	lines := []string{}
-	lines = append(lines, fmt.Sprintf("tree {%s}", commit.tree))
-	for i := range commit.parents {
-		lines = append(lines, fmt.Sprintf("parent %s", commit.parents[i]))
+	lines = append(lines, fmt.Sprintf("tree {%s}", commit.Tree))
+	for i := range commit.Parents {
+		lines = append(lines, fmt.Sprintf("parent %s", commit.Parents[i]))
 	}
-	lines = append(lines, fmt.Sprintf("author {%s}", commit.author))
-	lines = append(lines, fmt.Sprintf("commmitter {%s}", commit.committer))
+	lines = append(lines, fmt.Sprintf("author {%s}", commit.Author))
+	lines = append(lines, fmt.Sprintf("commmitter {%s}", commit.Committer))
 	lines = append(lines, "")
 	result := strings.Join(lines, "\n")
 	return result
-
 }

@@ -1,9 +1,9 @@
-package index
+package indexUtils
 
 //used to
 import (
 	"buildinggit"
-	"buildinggit/repository"
+	"buildinggit/repositoryUtils"
 	"encoding/json"
 	"main/utils"
 	"os"
@@ -31,7 +31,7 @@ func newEntry(name string, objectId []byte, stat *main.FileInfo) *Entry {
 	return &Entry{name: name, OId: objectId, Stat: stat}
 }
 
-func UpdateStatus(stat repository.Status) {
+func UpdateStatus(stat repositoryUtils.Status) {
 
 }
 

@@ -1,4 +1,4 @@
-package repository
+package repositoryUtils
 
 // this file is used to get all informations that git status command needed.
 type Status struct {

@@ -2,7 +2,8 @@ package main
 
 // This file is used to get the command from the console and dispatch to the functions.
 import (
-	index2 "buildinggit/index"
+	database2 "buildinggit/databaseUtils"
+	index2 "buildinggit/indexUtils"
 	"fmt"
 	"io/fs"
 	"os"
@@ -45,7 +46,7 @@ func commandDispatcher(command string, args []string) {
 
 	}
 
-	if command == "diff" {
+	if command == "diffUtils" {
 
 	}
 
@@ -104,7 +105,7 @@ func handleAdd(path string, args []string) {
 	//workspace := Workspace{path: path,
 	//	ignore: []string{".", "..", ".git"}}
 	database := newDatabase(path2.Join(gitPath, "objects"))
-	index := newIndex(path2.Join(gitPath, "index"))
+	index := newIndex(path2.Join(gitPath, "indexUtils"))
 	index.loadForUpdate()
 	for _, argPath := range args {
 		pathInDirectory := path2.Join(path, argPath)
@@ -161,7 +162,7 @@ func handleCommit(path string) {
 		entries = append(entries, &index2.Entry{name: filePath, objectId: object.id})
 	}
 
-	tree := newTree(entries)
+	tree := database2.newTree(entries)
 	object := Object{kind: "tree", content: []byte(tree.toString())}
 	database.write(object)
 	name := os.Getenv("JIT_AUTHOR_NAME")

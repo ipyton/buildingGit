@@ -1,6 +1,6 @@
 package main
 
-import repository2 "buildinggit/repository"
+import repository2 "buildinggit/repositoryUtils"
 
 type Base struct {
 	dir          string

@@ -1,4 +1,4 @@
-package repository
+package repositoryUtils
 
 import "slices"
 
@@ -18,7 +18,7 @@ type Migration struct {
 	delete []string
 	mkdirs map[string]bool
 	rmdirs map[string]bool
-	diff.
+
 }
 
 func (migration *Migration) Init(repository Repository, inspector Inspector) {

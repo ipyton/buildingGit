@@ -1,12 +1,12 @@
 package commands
 
 import (
-	repository2 "buildinggit/repository"
+	repository2 "buildinggit/repositoryUtils"
 	"flag"
 )
 
 const BOTH_CHANGED = "staged content different from both the file and the HEAD"
-const INDEX_CHANGED = "changes staged in the index"
+const INDEX_CHANGED = "changes staged in the indexUtils"
 const WORKSPACE_CHANGED = "local modifications"
 
 type Rm struct {

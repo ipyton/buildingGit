@@ -1,4 +1,4 @@
-package database
+package databaseUtils
 
 type Blob struct {
 	data string
