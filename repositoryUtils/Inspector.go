@@ -16,7 +16,27 @@ func (inspector *Inspector) IsTrackableFiles() {
 
 }
 
-func (inspector *Inspector) CompareIndexToWorkspace(entry *index2.Entry, stat os.FileInfo) string { //the workspace has uncommitted changes.
+func (inspector *Inspector) CompareIndexToWorkspace(item *index2.Entry, entry *database2.Entry) string { //the workspace has uncommitted changes.
+	///item is for staged, entry is for committed
+	if item == nil && entry == nil {
+		return ""
+	}
+	if item == nil {
+		return "added"
+	}
+	if entry == nil {
+		return "deleted"
+	}
+
+	if item.Mode != entry.Mode || bytes.Compare(item.Oid, entry.Oid) == 0 {
+		return "modified"
+	}
+	return ""
+}
+
+func (inspector *Inspector) CompareTreeToIndex(entry *index2.Entry, stat os.FileInfo) string {
+	// stat is for workspace, entry is for staged changes
+	// stat is for workspace, entry is for staged changes
 	if entry == nil {
 		return "untracked"
 	}
@@ -33,12 +53,9 @@ func (inspector *Inspector) CompareIndexToWorkspace(entry *index2.Entry, stat os
 	oid := util.HashBlobs(blob)
 	var b []byte = make([]byte, len(oid))
 	copy(b, oid[:])
-	if bytes.Compare(b, entry.OId) == 0 {
+	if bytes.Compare(b, entry.Oid) == 0 {
 		return "modified"
 	}
 	return ""
-}
-
-func (inspector *Inspector) CompareTreeToIndex(item, entry database2.Entry) {
 
 }

@@ -3,6 +3,7 @@ package commands
 import (
 	"buildinggit/repositoryUtils"
 	"os"
+	path2 "path"
 )
 
 type Base struct {
@@ -28,8 +29,8 @@ func (base *Base) repo() {
 
 }
 
-func (base *Base) expandedPathname() {
-
+func (base *Base) expandedPathname(targetPath string) string {
+	return path2.Join(targetPath, base.dir)
 }
 
 func (base *Base) parseOptions() {

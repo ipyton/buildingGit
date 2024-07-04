@@ -35,7 +35,7 @@ func recordChange() {
 }
 
 func (status Status) run() {
-	status.repository.index.loadForUpdate()
+	status.repository.Index.loadForUpdate()
 	status.printResults()
 
 }

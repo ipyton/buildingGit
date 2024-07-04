@@ -18,17 +18,18 @@ const ENTRY_FORMAT string = "N10H40nZ*"
 
 type Entry struct {
 	name  string
-	OId   []byte
+	Oid   [20]byte
 	Stat  *main.FileInfo
 	Path  string
 	ctime *time.Time
 	size  int64
 	mtime *time.Time
+	Mode  string
 }
 
-func newEntry(name string, objectId []byte, stat *main.FileInfo) *Entry {
+func newEntry(name string, objectId [20]byte, stat *main.FileInfo) *Entry {
 
-	return &Entry{name: name, OId: objectId, Stat: stat}
+	return &Entry{name: name, Oid: objectId, Stat: stat}
 }
 
 func UpdateStatus(stat repositoryUtils.Status) {
@@ -42,8 +43,9 @@ func parseEntryFromBytes(bytes []byte) Entry {
 	var result os.FileInfo
 	err := json.Unmarshal(bytes[24:], &result)
 	info := main.ParseFileInfo(string(bytes[24:]))
+
 	if err != nil {
-		return Entry{name: splits[0], OId: []byte(splits[1]), Stat: info}
+		return Entry{name: splits[0], Oid: [20]byte([]byte(splits[1])), Stat: info}
 	}
 	return Entry{}
 }
@@ -70,7 +72,7 @@ func (entry Entry) baseName() string {
 }
 
 func (entry Entry) key() []byte {
-	return entry.OId
+	return entry.Oid
 }
 
 func (entry Entry) StatMatch(stat os.FileInfo) bool {

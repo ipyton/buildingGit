@@ -3,6 +3,7 @@ package commands
 import (
 	repository2 "buildinggit/repositoryUtils"
 	"flag"
+	"fmt"
 )
 
 const BOTH_CHANGED = "staged content different from both the file and the HEAD"
@@ -68,19 +69,25 @@ func (rm *Rm) planRemoval(targetPath string) {
 	}
 	stat := rm.Repo.Workspace.StatFile(targetPath)
 	item := rm.Repo.Database.LoadTreeEntry(rm.headOid, targetPath)
-	entry := rm.Repo.Index.EntryForPath()
+	entry := rm.Repo.Index.EntryForPath(targetPath, 0)
 
-	rm.inspector.CompareTreeToIndex(item, stat)
-	rm.inspector.CompareIndexToWorkspace()
-
-	rm.Repo.Index.Remove(targetPath)
+	stagedChanges := rm.inspector.CompareTreeToIndex(item, stat)
+	unstagedChanges := rm.inspector.CompareIndexToWorkspace(entry, item)
+	if len(stagedChanges) != 0 && len(unstagedChanges) != 0 {
+		rm.bothChanged = append(rm.bothChanged, targetPath)
+	} else if len(stagedChanges) != 0 {
+		rm.uncommitted = append(rm.uncommitted, targetPath)
+	} else if len(unstagedChanges) != 0 {
+		rm.unstaged = append(rm.unstaged, targetPath)
+	}
 
 }
 
 func (rm *Rm) remove(target string) {
 	rm.Repo.Index.Remove(target)
 	if !rm.options["cached"] {
-		rm.Repo.Workspace.remove(target)
+		rm.Repo.Workspace.Remove(target)
 	}
+	fmt.Sprintf("rm %s", target)
 
 }

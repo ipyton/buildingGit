@@ -5,6 +5,7 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"os"
 	"path"
 )
@@ -38,13 +39,6 @@ func store() {
 
 func (d Database) HashObject(object []byte) [20]byte {
 	return sha1.Sum(object)
-}
-
-func serialize_object() {
-
-}
-func hash_content() {
-
 }
 
 func (d Database) writeToDisk(id [20]byte, content []byte) error {
@@ -96,18 +90,31 @@ func generateTempName() {
 
 }
 
+func (db *Database) SerializeObject(blob databaseUtils.Blob) string {
+	bytes := []byte(blob.ToS())
+	return fmt.Sprintf("%s %s\000%s", blob.Type(), len(bytes), bytes)
+
+}
+
+func (db *Database) Store(blob databaseUtils.Blob) {
+	object := db.SerializeObject(blob)
+	db.HashObject([]byte(object))
+
+}
+
 func (db *Database) load(oid [20]byte) databaseUtils.Commit {
 	//load files by object id
 	if db.objects[oid] == nil {
-		db.objects[oid] = readObject(oid)
+		db.objects[oid] = db.readObject(oid)
 	}
 	return db.objects[oid]
 
 }
 
-func (db *Database) LoadTreeEntry(headOid [20]byte, targetPath string) {
+func (db *Database) LoadTreeEntry(headOid [20]byte, targetPath string) *databaseUtils.Entry {
 	commit := db.load(headOid)
 	root := databaseUtils.NewEntry(commit.Tree, databaseUtils.TREE_MODE)
+	return &databaseUtils.Entry{}
 }
 
 func LoadTreeList(oid []byte) {

@@ -261,8 +261,8 @@ func (this Index) ChildPaths(targetPath string) []string {
 	return this.parentDirectory[targetPath]
 }
 
-func (this Index) EntryForPath(path string, stage int) {
-	this.entries
+func (this Index) EntryForPath(path string, stage int) *index2.Entry {
+	return this.entries[entities.EntryCompositeKey{Path: path, Stage: stage}]
 }
 
 func basename() {

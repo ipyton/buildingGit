@@ -13,15 +13,15 @@ type Workspace struct {
 // manipulating the files in directory
 //
 
-func (workspace Workspace) init(path string) {
+func (workspace *Workspace) init(path string) {
 	workspace.ignore[".gitignore"] = true
 	workspace.ignore["."] = true
 	workspace.ignore[".."] = true
 	workspace.path = path
 }
 
-func listFilesByPath(targetPath string) []string {
-	//get all files recursively in target path.
+func (workspace *Workspace) ListFiles(targetPath string) []string {
+	//get all files (excluding directory)recursively in target path.
 	var result []string
 	queue := make([]string, 0)
 	queue = append(queue, targetPath)
@@ -44,11 +44,7 @@ func listFilesByPath(targetPath string) []string {
 	return result
 }
 
-func (workspace Workspace) listFiles() []string {
-	return listFilesByPath(workspace.path)
-}
-
-func (workspace Workspace) listDirs(targetPath string) map[string]os.FileInfo {
+func (workspace *Workspace) listDirs(targetPath string) map[string]os.FileInfo {
 	dir, _ := os.ReadDir(targetPath)
 	hashmap := make(map[string]os.FileInfo)
 	for _, file := range dir {
@@ -59,16 +55,16 @@ func (workspace Workspace) listDirs(targetPath string) map[string]os.FileInfo {
 	return hashmap
 }
 
-func (workspace Workspace) ReadFile(target string) []byte {
+func (workspace *Workspace) ReadFile(target string) []byte {
 	file, _ := os.ReadFile(path.Join(workspace.path, target))
 	return file
 }
 
-func (workspace Workspace) writeFile(path string, data string, mode os.FileMode, mkdir bool) {
+func (workspace *Workspace) writeFile(path string, data string, mode os.FileMode, mkdir bool) {
 
 }
 
-func (workspace Workspace) removeDirectory(target string) {
+func (workspace *Workspace) removeDirectory(target string) {
 	// remove all things including directory
 	err := os.RemoveAll(target)
 	if err != nil {
@@ -76,7 +72,7 @@ func (workspace Workspace) removeDirectory(target string) {
 	}
 }
 
-func (workspace Workspace) remove(target string) {
+func (workspace *Workspace) Remove(target string) {
 	// remove a single file
 	targetPath := path.Join(workspace.path, target)
 	os.Remove(targetPath)
