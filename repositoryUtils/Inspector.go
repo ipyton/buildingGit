@@ -1,7 +1,7 @@
 package repositoryUtils
 
 import (
-	database2 "buildinggit/databaseUtils"
+	database2 "buildinggit/DatabaseUtils"
 	index2 "buildinggit/indexUtils"
 	"buildinggit/util"
 	"bytes"

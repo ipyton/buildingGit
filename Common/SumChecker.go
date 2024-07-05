@@ -1,4 +1,4 @@
-package main
+package Common
 
 import (
 	"crypto/sha1"
@@ -8,13 +8,13 @@ import (
 )
 
 type SumChecker struct {
-	file * os.File
-	sha1Digest hash.Hash
+	file         *os.File
+	sha1Digest   hash.Hash
 	checkSumSize int
 }
 
-//initialize
-func newSumChecker(path string) SumChecker{
+// initialize
+func newSumChecker(path string) SumChecker {
 	fileToCheck, error := os.Open(path)
 	if error != nil {
 		fmt.Println("file does not exist!")
@@ -25,7 +25,7 @@ func newSumChecker(path string) SumChecker{
 func (checker SumChecker) read(size int) bool {
 	buffer := make([]byte, size, size)
 	read, err := checker.file.Read(buffer)
-	if read != size ||  err != nil{
+	if read != size || err != nil {
 		return false
 	}
 	_, err = checker.sha1Digest.Write(buffer)
@@ -36,7 +36,7 @@ func (checker SumChecker) read(size int) bool {
 }
 
 func (checker SumChecker) verify() bool {
-	buffer := make([]byte, checker.checkSumSize,checker.checkSumSize)
+	buffer := make([]byte, checker.checkSumSize, checker.checkSumSize)
 	numberOfBytes, error := checker.file.Read(buffer)
 	if numberOfBytes != checker.checkSumSize || error != nil {
 		return false

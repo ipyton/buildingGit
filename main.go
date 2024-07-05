@@ -2,7 +2,8 @@ package main
 
 // This file is used to get the command from the console and dispatch to the functions.
 import (
-	database2 "buildinggit/databaseUtils"
+	"buildinggit/Common"
+	database2 "buildinggit/DatabaseUtils"
 	index2 "buildinggit/indexUtils"
 	"fmt"
 	"io/fs"
@@ -113,7 +114,7 @@ func handleAdd(path string, args []string) {
 		for _, file := range byPath {
 			data := readFile(file)
 			stat := statFile(file)
-			blob := newObject(data, "blob")
+			blob := Common.newObject(data, "blob")
 			database.write(blob)
 			index.add(path, blob.id, stat)
 		}
@@ -151,19 +152,19 @@ func handleCommit(path string) {
 	gitPath := path2.Join(path, ".git")
 	objectsPath := path2.Join(gitPath, "objects")
 	fmt.Println(objectsPath)
-	workspace := Workspace{path: path,
+	workspace := Common.Workspace{path: path,
 		ignore: []string{".", "..", ".git"}}
 	files := workspace.listFiles()
 	database := newDatabase(objectsPath)
 	for _, filePath := range files {
 		data := readFile(filePath)
-		object := newObject(data, "blob")
+		object := Common.newObject(data, "blob")
 		database.write(object)
 		entries = append(entries, &index2.Entry{name: filePath, objectId: object.id})
 	}
 
 	tree := database2.newTree(entries)
-	object := Object{kind: "tree", content: []byte(tree.toString())}
+	object := Common.Object{kind: "tree", content: []byte(tree.toString())}
 	database.write(object)
 	name := os.Getenv("JIT_AUTHOR_NAME")
 	email := os.Getenv("JIT_AUTHOR_EMAIL")
@@ -171,11 +172,11 @@ func handleCommit(path string) {
 	var message string
 	fmt.Scanln(&message)
 
-	ref := newRef(gitPath)
+	ref := Common.newRef(gitPath)
 	parent := ref.readHead()
 
 	commit := newCommit(object.id, author, message, time.Now(), parent)
-	commitObject := Object{kind: "commit", content: []byte(commit.toString())}
+	commitObject := Common.Object{kind: "commit", content: []byte(commit.toString())}
 	database.write(commitObject)
 	headPath := path2.Join(gitPath, "HEAD")
 	file, _ := os.OpenFile(headPath, os.O_CREATE|os.O_WRONLY, 0777)

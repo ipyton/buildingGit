@@ -1,6 +1,7 @@
-package main
+package Common
 
 import (
+	"buildinggit/common"
 	"buildinggit/entities"
 	index2 "buildinggit/indexUtils"
 	"buildinggit/util"
@@ -86,7 +87,7 @@ func (this Index) load(path string) {
 	if this.file != nil {
 		headerSize := this.readHeader(*this.file)
 		this.readEntries(*this.file, headerSize)
-		checker := newSumChecker(this.path)
+		checker := common.newSumChecker(this.path)
 		checker.verify()
 
 	}

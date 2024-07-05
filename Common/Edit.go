@@ -1,17 +1,15 @@
-package main
-
-
+package Common
 
 type Line struct {
 	number int
-	text string
+	text   string
 }
 
 type Edit struct {
 	t string
 }
 
-func (edit * Edit) toString() {
+func (edit *Edit) toString() {
 
 }
 
@@ -23,7 +21,7 @@ func lines() {
 
 }
 
-func Diff(){
+func Diff() {
 
 }
 
@@ -38,4 +36,3 @@ func combined() {
 func combinedHunks() {
 
 }
-

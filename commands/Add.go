@@ -29,10 +29,9 @@ func (add *Add) addToIndex(path string) {
 	file := add.Repo.Workspace.ReadFile(path)
 	stat := add.Repo.Workspace.StatFile(path)
 	blob := databaseUtils.Blob{Data: string(file)}
+	add.Repo.Database.Store(blob) // store will give it a oid
+	add.Repo.Index.Add(path, blob.Oid, stat)
 
-	add.Repo.Database.Store(blob)// store will give it a oid
-
-	add.Repo.Index.Add(path, file.)
 }
 
 func (add *Add) handleLockedIndex() {

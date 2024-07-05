@@ -1,4 +1,4 @@
-package main
+package Common
 
 import (
 	"errors"
@@ -19,7 +19,7 @@ func newRef(pathName string) Refs {
 }
 
 func (ref Refs) updateHead(objectId string) error {
-	lock := newLock(ref.getHeadPath())
+	lock := main.newLock(ref.getHeadPath())
 	if !lock.lock() {
 		return errors.New("lock could not be acquired exist")
 	}

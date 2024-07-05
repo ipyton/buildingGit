@@ -1,11 +1,13 @@
-package main
+package Common
 
-import index2 "buildinggit/indexUtils"
+import (
+	index2 "buildinggit/indexUtils"
+)
 
 type Status struct {
 	untracked []string
 	changes   map[string][]string
-	Base
+	main.Base
 }
 
 func LongStatus() map[string]string {

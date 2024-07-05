@@ -1,4 +1,4 @@
-package main
+package Common
 
 import (
 	"os"
@@ -8,9 +8,8 @@ import (
 type Lock struct {
 	filePath string
 	lockPath string
-	status bool
-	file *os.File
-
+	status   bool
+	file     *os.File
 }
 
 func newLock(path string) Lock {
@@ -50,10 +49,10 @@ func (lock Lock) commit() {
 	lock.file = nil
 }
 
-func (lock Lock) rollback() bool{
+func (lock Lock) rollback() bool {
 	lock.raiseOnStaleLock()
 	err := lock.file.Close()
-	if err != nil  {
+	if err != nil {
 		return false
 	}
 	err = os.Remove(lock.filePath)

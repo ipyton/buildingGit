@@ -1,4 +1,4 @@
-package main
+package Common
 
 import (
 	"strings"
@@ -13,13 +13,13 @@ type Commit struct {
 	Parent      string
 }
 
-func newCommit(treeId string, author Author, message string, currentTime time.Time, parent string) *Commit {
+func NewCommit(treeId string, author Author, message string, currentTime time.Time, parent string) *Commit {
 	return &Commit{TreeId: treeId, Author: author, Message: message, CurrentTime: currentTime, Parent: parent}
 }
 
 func (commit Commit) toString() string {
 	var lines []string
-	lines = []string{commit.treeId, commit.author.toString(), commit.parent, "", commit.currentTime.String(), commit.message}
+	lines = []string{commit.TreeId, commit.Author.toString(), commit.parent, "", commit.currentTime.String(), commit.message}
 	join := strings.Join(lines, "\n")
 	return join
 }

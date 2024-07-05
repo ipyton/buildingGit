@@ -1,4 +1,4 @@
-package databaseUtils
+package DatabaseUtils
 
 import (
 	"fmt"

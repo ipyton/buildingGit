@@ -1,6 +1,6 @@
-package databaseUtils
+package DatabaseUtils
 
-// Entry for databaseUtils
+// Entry for DatabaseUtils
 type Entry struct {
 	Oid  [20]byte
 	Mode string

@@ -1,7 +1,7 @@
-package main
+package Common
 
 import (
-	"buildinggit/databaseUtils"
+	"buildinggit/DatabaseUtils"
 	"crypto/sha1"
 	"encoding/base64"
 	"errors"
@@ -11,7 +11,7 @@ import (
 )
 
 type Database struct {
-	databaseUtils.Backends
+	DatabaseUtils.Backends
 	path    string
 	objects map[[20]byte]*Object
 }
@@ -98,8 +98,8 @@ func (db *Database) SerializeObject(blob databaseUtils.Blob) string {
 
 func (db *Database) Store(blob databaseUtils.Blob) {
 	object := db.SerializeObject(blob)
-	db.HashObject([]byte(object))
-
+	blob.Oid = db.HashObject([]byte(object))
+	db.WriteObject
 }
 
 func (db *Database) load(oid [20]byte) databaseUtils.Commit {
