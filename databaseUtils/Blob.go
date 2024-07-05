@@ -1,15 +1,16 @@
 package databaseUtils
 
 type Blob struct {
-	data string
+	Data string
+	Oid  string
 }
 
 func (b *Blob) ToS() string {
-	return b.data
+	return b.Data
 }
 
 func (b *Blob) Parse(data string) {
-	b.data = data
+	b.Data = data
 }
 
 func (Blob) Type() string {

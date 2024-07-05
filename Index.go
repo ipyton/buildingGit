@@ -55,7 +55,7 @@ func (this Index) clear() bool {
 	return true
 }
 
-func (this Index) add(pathName string, oid string, state os.FileInfo) {
+func (this Index) Add(pathName string, oid string, state os.FileInfo) {
 	//entry := newEntry(pathName, oid, state)
 	//this.entries[pathName] = &entry
 	//this.changed = true
