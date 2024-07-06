@@ -1,4 +1,4 @@
-package Common
+package GitCommon
 
 import (
 	"crypto/sha1"

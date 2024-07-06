@@ -1,4 +1,4 @@
-package Common
+package GitCommon
 
 type Line struct {
 	number int

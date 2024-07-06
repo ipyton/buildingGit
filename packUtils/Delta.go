@@ -39,8 +39,18 @@ func (insert *Insert) ToS() string {
 }
 
 type Delta struct {
+	data Entry
+	base Entry
+	dataSize int64
+}
+
+func NewDelta(source * Unpacked, target * Unpacked) * Delta{
+	source.
+	return & Delta{base:source.entry, dataSize: source.entry.Info.Size() + target.entry.Info.Size()}
+
 }
 
 func (delta *Delta) ParseDelta(input []byte, size int64) {
+
 
 }

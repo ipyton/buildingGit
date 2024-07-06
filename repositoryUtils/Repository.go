@@ -2,15 +2,15 @@ package repositoryUtils
 
 import (
 	"buildinggit"
-	"buildinggit/Common"
+	"buildinggit/GitCommon"
 )
 
 type Repository struct {
 	gitPath   string
 	Index     main.Index
-	Workspace Common.Workspace
+	Workspace GitCommon.Workspace
 	Database  main.Database
-	refs      Common.Refs
+	refs      GitCommon.Refs
 }
 
 func newRepository() {

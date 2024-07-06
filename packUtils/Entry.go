@@ -10,8 +10,9 @@ type Entry struct {
 	Info  os.FileInfo
 	Path  string
 	Ofs   bool
-	Delta string
+	Delta *Delta
 	Depth int
+	Type  string
 }
 
 func initializeEntry(oid string, info os.FileInfo, path string, ofs bool) *Entry {
@@ -30,7 +31,11 @@ func packedType() string {
 
 }
 
-func packedSize() {
+func (entry *Entry) packedSize() int64 {
+	if entry.Delta != nil {
+		return entry.Delta.dataSize
+	}
+	return entry.Info.Size()
 
 }
 

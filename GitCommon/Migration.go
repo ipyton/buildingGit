@@ -1,4 +1,4 @@
-package Common
+package GitCommon
 
 import index2 "buildinggit/indexUtils"
 

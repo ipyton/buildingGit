@@ -2,8 +2,8 @@ package main
 
 // This file is used to get the command from the console and dispatch to the functions.
 import (
-	"buildinggit/Common"
 	database2 "buildinggit/DatabaseUtils"
+	"buildinggit/GitCommon"
 	index2 "buildinggit/indexUtils"
 	"fmt"
 	"io/fs"
@@ -114,7 +114,7 @@ func handleAdd(path string, args []string) {
 		for _, file := range byPath {
 			data := readFile(file)
 			stat := statFile(file)
-			blob := Common.newObject(data, "blob")
+			blob := GitCommon.newObject(data, "blob")
 			database.write(blob)
 			index.add(path, blob.id, stat)
 		}
@@ -152,19 +152,19 @@ func handleCommit(path string) {
 	gitPath := path2.Join(path, ".git")
 	objectsPath := path2.Join(gitPath, "objects")
 	fmt.Println(objectsPath)
-	workspace := Common.Workspace{path: path,
+	workspace := GitCommon.Workspace{path: path,
 		ignore: []string{".", "..", ".git"}}
 	files := workspace.listFiles()
 	database := newDatabase(objectsPath)
 	for _, filePath := range files {
 		data := readFile(filePath)
-		object := Common.newObject(data, "blob")
+		object := GitCommon.newObject(data, "blob")
 		database.write(object)
 		entries = append(entries, &index2.Entry{name: filePath, objectId: object.id})
 	}
 
 	tree := database2.newTree(entries)
-	object := Common.Object{kind: "tree", content: []byte(tree.toString())}
+	object := GitCommon.Object{kind: "tree", content: []byte(tree.toString())}
 	database.write(object)
 	name := os.Getenv("JIT_AUTHOR_NAME")
 	email := os.Getenv("JIT_AUTHOR_EMAIL")
@@ -172,11 +172,11 @@ func handleCommit(path string) {
 	var message string
 	fmt.Scanln(&message)
 
-	ref := Common.newRef(gitPath)
+	ref := GitCommon.newRef(gitPath)
 	parent := ref.readHead()
 
-	commit := newCommit(object.id, author, message, time.Now(), parent)
-	commitObject := Common.Object{kind: "commit", content: []byte(commit.toString())}
+	commit := GitCommon.NewCommit(object.id, author, message, time.Now(), parent)
+	commitObject := GitCommon.Object{kind: "commit", content: []byte(commit.toString())}
 	database.write(commitObject)
 	headPath := path2.Join(gitPath, "HEAD")
 	file, _ := os.OpenFile(headPath, os.O_CREATE|os.O_WRONLY, 0777)

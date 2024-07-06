@@ -35,8 +35,9 @@ func (window *Window) each() []Unpacked {
 	}
 	return result
 }
-func (window *Window) add(entry Entry, data []byte) {
+func (window *Window) add(entry Entry, data []byte) *Unpacked {
 	unpacked := Unpacked{entry: entry, data: data}
 	window.objects[window.offset] = unpacked
+	return &unpacked
 
 }
